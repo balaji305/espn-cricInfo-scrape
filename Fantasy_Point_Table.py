@@ -761,6 +761,10 @@ def Fantasy_Point_Table_Call():
             
         elif updation_status == 'Failed':
             print('Failed to Update : '+str(match_id))
+
+    #DELETING ENTRIES WITH 0 BAT INNINGS, 0 BOWL INNINGS
+    delete_query="""delete from fantasy_point_table where Bat_Innings=0 and Bowl_Innings=0"""
+    mycursor.execute(delete_query)
         
     #FINAL COMMIT TO DATABASE       
     mydb.commit()
