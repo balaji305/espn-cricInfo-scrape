@@ -1,0 +1,5 @@
+Output/
+__pycache__/
+.vscode/
+.idea/
+.ipynb_checkpoints/
