@@ -25,13 +25,13 @@ def Player_Table_Call():
     fetch_Player= """SELECT Player_ID,Match_Type,Match_Player_ID FROM fantasy_point_table where Status='NOT UPDATED'"""
 
     #QUERY FOR INSERTING DATA INTO DATABASE
-    Insert_player="""Insert into player_table (Match_Type_Player_ID,Player_ID,Match_Type,Matches,Total_Fantasy,Batting_Fantasy,Bowling_Fantasy,Fielding_Fantasy,In_Dream_Team,Captain,Vice_Captain,Bat_Innings,Bowl_Innings) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+    Insert_player="""Insert into player_table (Match_Type_Player_ID,Player_ID,Match_Type,Matches,Batting_Fantasy,Bowling_Fantasy,Fielding_Fantasy,Value_Fantasy,Total_Fantasy,In_Dream_Team,Captain,Vice_Captain,Bat_Innings,Bowl_Innings) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 
     #QUERY FOR UPDATING DATA INTO DATABASE
     Update_data="""UPDATE player_table SET Matches = %s,Total_Fantasy = %s, Batting_Fantasy = %s,Bowling_Fantasy = %s,Fielding_Fantasy = %s, In_Dream_Team = %s, Captain = %s,Vice_Captain = %s,Bat_innings = %s,Bowl_innings = %s WHERE Match_Type_Player_ID =%s """
 
     #QUERY FOR SELECTING DATA FROM DATABASE
-    select_data="""SELECT * PLAYER_TABLE WHERE MATCH_TYPE_PLAYER_ID = %s"""
+    select_data="""SELECT * FROM PLAYER_TABLE WHERE MATCH_TYPE_PLAYER_ID = %s"""
 
     #QUERY FOR SELECTING PLAYER FROM DATABASE
     select_player = """SELECT * FROM fantasy_point_table WHERE Match_Player_ID = %s"""
@@ -41,10 +41,10 @@ def Player_Table_Call():
 
     #INSERTING DATA INTO DATABASE
     mycursor.execute(fetch_Player)
-    for row in mycursor.fetchall():
-        player_id=row[0]
-        match_type=row[1]
-        match_player_id=row[2]
+    for data in mycursor.fetchall():
+        player_id=data[0]
+        match_type=data[1]
+        match_player_id=data[2]
         match_type_player=str(player_id)+'_'+str(match_type)
                     
         select_data_value=(str(player_id)+'_'+str(match_type))
@@ -56,34 +56,34 @@ def Player_Table_Call():
             record=mycursor.fetchall()
             row=list(record[-1])
             if match_type==2 or match_type==3 or match_type==9 or match_type==10:
-                insert_value=(match_type_player,player_id,match_type,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[16]),int(row[17]),int(row[18]),int(row[19]))
-                mycursor.execute(Insert_player,(insert_value,))
+                insert_value=(match_type_player,player_id,match_type,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[17]),int(row[18]),int(row[19]),int(row[20]),int(row[21]))
+                mycursor.execute(Insert_player,insert_value)
                 mycursor.execute(update_status,(match_player_id,))
                 print("Sucessfully Inserted : ",player_id," ",match_type," ",match_type_player)
 
                 if match_type ==2:
                     match_type1=5
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[16]),int(row[17]),int(row[18]),int(row[19]))
+                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[17]),int(row[18]),int(row[19]),int(row[20]),int(row[21]))
                 elif match_type ==3:
                     match_type1=6
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[16]),int(row[17]),int(row[18]),int(row[19]))
+                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[17]),int(row[18]),int(row[19]),int(row[20]),int(row[21]))
                 elif match_type ==9:
                     match_type1=12
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[16]),int(row[17]),int(row[18]),int(row[19]))
+                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[17]),int(row[18]),int(row[19]),int(row[20]),int(row[21]))
                 elif match_type ==10:
                     match_type1=17
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[16]),int(row[17]),int(row[18]),int(row[19]))
+                    insert_value=(match_type_player1,player_id,match_type1,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[17]),int(row[18]),int(row[19]),int(row[20]),int(row[21]))
 
-                mycursor.execute(Insert_player,(insert_value,))
+                mycursor.execute(Insert_player,insert_value)
                 mycursor.execute(update_status,(match_player_id,))
                 mydb.commit()
                 print("Sucessfully Inserted : ",player_id," ",match_type1," ",match_type_player1)
             else:
-                insert_value=(match_type_player,player_id,match_type,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[16]),int(row[17]),int(row[18]),int(row[19]))
+                insert_value=(match_type_player,player_id,match_type,1,int(row[11]),int(row[12]),int(row[13]),int(row[14]),int(row[15]),int(row[17]),int(row[18]),int(row[19]),int(row[20]),int(row[21]))
                 mycursor.execute(Insert_player,(insert_value,))
                 mycursor.execute(update_status,(match_player_id,))
                 mydb.commit()
@@ -92,12 +92,15 @@ def Player_Table_Call():
         else:          
             #update existing row in player_table as we are fetching all values from fantasy_point_table
             mycursor.execute(select_player,(match_player_id,))
-            record=mycursor.fetchall()
-            row=list(record[-1])
-            Update_data="""UPDATE player_table SET Matches = %s,Total_Fantasy = %s, Batting_Fantasy = %s,Bowling_Fantasy = %s,Fielding_Fantasy = %s, In_Dream_Team = %s, Captain = %s,Vice_Captain = %s,Bat_innings = %s,Bowl_innings = %s WHERE Match_Type_Player_ID =%s """
+            row=list(mycursor.fetchall()[0])
+
+            mycursor.execute(select_data,(select_data_value,))
+            record=list(mycursor.fetchall()[0])
+
+            Update_data="""UPDATE player_table SET Matches = %s, Batting_Fantasy = %s,Bowling_Fantasy = %s,Fielding_Fantasy = %s, Value_Fantasy = %s, Total_Fantasy = %s, In_Dream_Team = %s, Captain = %s,Vice_Captain = %s,Bat_innings = %s,Bowl_innings = %s WHERE Match_Type_Player_ID =%s """
 
             if match_type==2 or match_type==3 or match_type==9 or match_type==10:
-                update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[16]),int(record[11])+int(row[17]),int(record[12])+int(row[18]),int(record[13])+int(row[19]),match_type_player)
+                update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[17]),int(record[11])+int(row[18]),int(record[12])+int(row[19]),int(record[13])+int(row[20]),int(record[14])+int(row[21]),match_type_player)
                 mycursor.execute(Update_data,update_value)
                 mycursor.execute(update_status,(match_player_id,))
                 mydb.commit()
@@ -106,19 +109,19 @@ def Player_Table_Call():
                 if match_type ==2:
                     match_type1=5
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[16]),int(record[11])+int(row[17]),int(record[12])+int(row[18]),int(record[13])+int(row[19]),match_type_player1)
+                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[17]),int(record[11])+int(row[18]),int(record[12])+int(row[19]),int(record[13])+int(row[20]),int(record[14])+int(row[21]),match_type_player1)
                 elif match_type ==3:
                     match_type1=6
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[16]),int(record[11])+int(row[17]),int(record[12])+int(row[18]),int(record[13])+int(row[19]),match_type_player1)
+                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[17]),int(record[11])+int(row[18]),int(record[12])+int(row[19]),int(record[13])+int(row[20]),int(record[14])+int(row[21]),match_type_player1)
                 elif match_type ==9:
                     match_type1=12
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[16]),int(record[11])+int(row[17]),int(record[12])+int(row[18]),int(record[13])+int(row[19]),match_type_player1)
+                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[17]),int(record[11])+int(row[18]),int(record[12])+int(row[19]),int(record[13])+int(row[20]),int(record[14])+int(row[21]),match_type_player1)
                 elif match_type ==10:
                     match_type1=17
                     match_type_player1=str(player_id)+'_'+str(match_type1)
-                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[16]),int(record[11])+int(row[17]),int(record[12])+int(row[18]),int(record[13])+int(row[19]),match_type_player1)
+                    update_value=(int(record[4])+1,int(record[5])+int(row[11]),int(record[6])+int(row[12]),int(record[7])+int(row[13]),int(record[8])+int(row[14]),int(record[9])+int(row[15]),int(record[10])+int(row[17]),int(record[11])+int(row[18]),int(record[12])+int(row[19]),int(record[13])+int(row[20]),int(record[14])+int(row[21]),match_type_player1)
 
                 mycursor.execute(Update_data,update_value)
                 mycursor.execute(update_status,(match_player_id,))
