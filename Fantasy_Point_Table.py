@@ -680,7 +680,7 @@ def Fantasy_Point_Table_Call():
         
         try:
             #QUERY FOR INSERTING FANTASY POINTS
-            insert_data="""Insert into  fantasy_point_table (Match_Player_ID,Player_ID,Player_Name,Match_ID,Team_ID,Opponent_Team_ID,Ground_ID,Match_Date,Innings_Order,Match_Type,Matches,Total_Fantasy,Batting_Fantasy,Bowling_Fantasy,Fielding_Fantasy,In_Dream_Team,Captain,Vice_Captain,Bat_Innings,Bowl_Innings,Status) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+            insert_data="""Insert into  fantasy_point_table (Match_Player_ID,Player_ID,Player_Name,Match_ID,Team_ID,Opponent_Team_ID,Ground_ID,Match_Date,Innings_Order,Match_Type,Matches,Batting_Fantasy,Bowling_Fantasy,Fielding_Fantasy,Value_Fantasy,Total_Fantasy,Player_Rank,In_Dream_Team,Captain,Vice_Captain,Bat_Innings,Bowl_Innings,Status) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 
             #QUERY FOR UPDATING STATUS OF THE PLAYER IN ALL MATCH OF SAME FORMAT TO 'NOT UPDATED' TO IDENTIFY DURING PLAYER TABLE UPDATE
             update_status="""UPDATE fantasy_point_table SET Status = 'NOT UPDATED' where player_id =%s and match_type =%s"""
@@ -692,7 +692,7 @@ def Fantasy_Point_Table_Call():
                 try:
                     #INSERT DATA IN DATABASE
                     match_playerid=str(match_id)+'_'+str(d)
-                    value=(match_playerid,d,data_name[d],match_id,data_team[d],data_opponent[d],ground_id,match_date,data_innings[d],match_type,data_all[d]['Matches'],data_all[d]['points'],data_bat[d],data_bowl[d],data_field[d],data_all[d]['In_dream_team'],data_all[d]['captain'],data_all[d]['vice_captain'],data_all[d]['Bat_innings'],data_all[d]['Bowl_innings'],'NOT UPDATED')
+                    value=(match_playerid,d,data_name[d],match_id,data_team[d],data_opponent[d],ground_id,match_date,data_innings[d],match_type,data_all[d]['Matches'],data_bat[d],data_bowl[d],data_field[d],data_bat[d]+data_bowl[d],data_all[d]['points'],0,data_all[d]['In_dream_team'],data_all[d]['captain'],data_all[d]['vice_captain'],data_all[d]['Bat_innings'],data_all[d]['Bowl_innings'],'NOT UPDATED')
                     mycursor.execute(insert_data,value)
                     
                     #UPDATE STATUS OF THE PLAYER IN ALL MATCH OF SAME CATEGORY TO 'NOT UPDATED' TO IDENTIFY DURING PLAYER TABLE UPDATE
@@ -722,7 +722,7 @@ def Fantasy_Point_Table_Call():
             return 'Failed'
 
     #QUERY FOR FETCHING UNUPDATED MATCHES FROM MATCH ID TABLE
-    search="""select * from match_table where Match_Updation='NOT UPDATED'"""
+    search="""select * from match_table where Match_Updation='NOT UPDATED ORDER BY Match_Date DESC'"""
 
     #QUERY FOR UPDATING STATUS OF THE MATCH IN MATCH ID TABLE
     update_status_in_match_id="""update match_table set Match_Updation=%s where Match_ID =%s"""
@@ -765,6 +765,42 @@ def Fantasy_Point_Table_Call():
     #DELETING ENTRIES WITH 0 BAT INNINGS, 0 BOWL INNINGS
     delete_query="""delete from fantasy_point_table where Bat_Innings=0 and Bowl_Innings=0"""
     mycursor.execute(delete_query)
+
+    #PLAYER RANK CALCULATION
+    update_rank_params="""SET @prev_value=NULL, @prev_match=NULL, @rank=1, @count=0;"""
+    update_rank="""UPDATE fantasy_point_table INNER JOIN (
+        SELECT 
+            Match_ID, 
+            Player_ID, 
+            Value_Fantasy,
+            @rank := CASE
+                WHEN @prev_match = Match_ID AND @prev_value = Value_Fantasy THEN @rank
+                WHEN @prev_match = Match_ID AND @prev_value <> Value_Fantasy THEN @rank + @count
+                ELSE 1
+            END AS Player_Rank,
+            @count := CASE
+                WHEN @prev_match = Match_ID AND @prev_value = Value_Fantasy THEN @count + 1
+                ELSE 1
+            END,
+            @prev_value := Value_Fantasy,
+            @prev_match := Match_ID
+        FROM 
+            fantasy_point_table
+        ORDER BY 
+            Match_ID, 
+            Value_Fantasy DESC
+    ) AS ranks
+    ON fantasy_point_table.Match_ID = ranks.Match_ID AND fantasy_point_table.Player_ID = ranks.Player_ID
+    SET fantasy_point_table.Player_Rank = ranks.Player_Rank;"""
+
+    mycursor.execute(update_rank_params)
+    mycursor.execute(update_rank)
+    mydb.commit()
+
+    #DREAM TEAM, CAPTAIN AND VICE CAPTAIN RANK CALCULATION
+    update_dream_team_captain_vice_captain = """UPDATE fantasy_point_table SET In_Dream_Team = CASE WHEN Player_Rank <= 11 THEN 1 ELSE 0 END, Captain = CASE WHEN Player_Rank = 1 THEN 1 ELSE 0 END, Vice_Captain = CASE WHEN Player_Rank = 2 THEN 1 ELSE 0 END;"""
+    mycursor.execute(update_dream_team_captain_vice_captain)
+    mydb.commit()
         
     #FINAL COMMIT TO DATABASE       
     mydb.commit()
