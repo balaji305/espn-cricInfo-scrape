@@ -17,8 +17,7 @@ def Report_Generation_Call():
     
     #READ INPUT FILE
     input_data = pd.read_excel("./Docs/Report Input.xlsx",sheet_name='Sheet1',header=0)
-    # player_url = list(input_data['Player URL'])
-    player_id = list(input_data['Player ID'])
+    player_url = list(input_data['Player URL'])
     innings_order = list(input_data['Innings Order'])
     ground_id = list(input_data['Ground ID'])
     opponent_id = list(input_data['Opponent ID'])
@@ -29,6 +28,7 @@ def Report_Generation_Call():
     form = list(input_data['Form'])
     international = list(input_data['International'])
     days = list(input_data['Days'])
+    player_id=[]
 
     #REPORTS DATAFRAME
     report_1 = pd.DataFrame(
@@ -61,8 +61,8 @@ def Report_Generation_Call():
         else:
             return 10
 
-    for i in range(len(player_id)):
-        # player_id.append(player_url[i].split('-')[-1])
+    for i in range(len(player_url)):
+        player_id.append(player_url[i].split('-')[-1])
         player_id[i] = int(player_id[i])
         innings_order[i] = int(innings_order[i])
         ground_id[i] = int(ground_id[i])
@@ -223,21 +223,21 @@ def Report_Generation_Call():
                 if(match_format[i] in supersetCategory):
                     if(innings_order[i] == 3):
                         query4 = """select sum(Matches),sum(Player_Rank),sum(Value_Fantasy),sum(In_Dream_Team),sum(Captain),sum(Vice_Captain) from fantasy_point_table 
-                        where Player_ID = %s and Match_Type in (%s, %s) and Ground_ID = %s and Opponent_Team_ID = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
-                        value4 = (player_id[i],match_format[i],get_Superset_Category(match_format[i]),ground_id[i],opponent_id[i],days[i])
+                        where Player_ID = %s and Match_Type in (%s, %s) and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
+                        value4 = (player_id[i],match_format[i],get_Superset_Category(match_format[i]),days[i])
                     else:
                         query4 = """select sum(Matches),sum(Player_Rank),sum(Value_Fantasy),sum(In_Dream_Team),sum(Captain),sum(Vice_Captain) from fantasy_point_table 
-                        where Player_ID = %s and Match_Type in (%s, %s) and Innings_Order = %s and Ground_ID = %s and Opponent_Team_ID = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
-                        value4 = (player_id[i],match_format[i],get_Superset_Category(match_format[i]),innings_order[i],ground_id[i],opponent_id[i],days[i])
+                        where Player_ID = %s and Match_Type in (%s, %s) and Innings_Order = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
+                        value4 = (player_id[i],match_format[i],get_Superset_Category(match_format[i]),innings_order[i],days[i])
                 else:
                     if(innings_order[i] == 3):
                         query4 = """select sum(Matches),sum(Player_Rank),sum(Value_Fantasy),sum(In_Dream_Team),sum(Captain),sum(Vice_Captain) from fantasy_point_table 
-                        where Player_ID = %s and Match_Type = %s and Ground_ID = %s and Opponent_Team_ID = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
-                        value4 = (player_id[i],match_format[i],ground_id[i],opponent_id[i],days[i])
+                        where Player_ID = %s and Match_Type = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
+                        value4 = (player_id[i],match_format[i],days[i])
                     else:
                         query4 = """select sum(Matches),sum(Player_Rank),sum(Value_Fantasy),sum(In_Dream_Team),sum(Captain),sum(Vice_Captain) from fantasy_point_table 
-                        where Player_ID = %s and Match_Type = %s and Innings_Order = %s and Ground_ID = %s and Opponent_Team_ID = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
-                        value4 = (player_id[i],match_format[i],innings_order[i],ground_id[i],opponent_id[i],days[i])
+                        where Player_ID = %s and Match_Type = %s and Innings_Order = %s and Match_Date > DATE_SUB(NOW(), INTERVAL %s DAY)"""
+                        value4 = (player_id[i],match_format[i],innings_order[i],days[i])
 
                 my_cursor.execute(query4,value4)
                 result4 = my_cursor.fetchall()
