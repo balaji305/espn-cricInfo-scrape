@@ -44,7 +44,6 @@ def Player_vs_Player_Call():
         if(ground != 0):
             query += f""" AND Ground_ID = {ground}"""
         query += ";"
-        print(query)
         my_cursor.execute(query)
         results = my_cursor.fetchall()
 
@@ -53,24 +52,7 @@ def Player_vs_Player_Call():
 
         return match_ids, team_ids
     
-    #Iterate every row in the dataframe except first one
-    for index, row in df.iterrows():
-        #PLAYER1 DETAILS
-        player1_url = row.iloc[0]
-        player1_id = int(player1_url.split('-')[-1])
-        
-        #PLAYER2 DETAILS
-        player2_url = row.iloc[1]
-        player2_id = int(player2_url.split('-')[-1])
-        
-        #MATCH TYPE
-        match_type = int(row.iloc[2])
-
-        #INNINGS
-        innings = int(row.iloc[3])
-
-        #GROUND
-        ground = int(row.iloc[4])
+    def get_player_vs_player_data(player1_id, player2_id, match_type, innings, ground):
 
         #PLAYER NAMES
         name_query = """SELECT Player_Name from fantasy_point_table WHERE Player_ID = %s"""
@@ -80,8 +62,6 @@ def Player_vs_Player_Call():
 
         my_cursor.execute(name_query, (player2_id,))
         player2_name = my_cursor.fetchall()[0][0]
-
-        print(player1_name, player2_name)   
         
         if(player1_name != None and player2_name != None):
             All_match_ids = []
@@ -104,19 +84,6 @@ def Player_vs_Player_Call():
             for i in range(len(player2_ids)):
                 player2_match_team_map[player2_ids[i]] = player2_teams[i]
 
-
-            # new_All_match_ids = []
-            # for i in range(len(bowlers_id)):
-            #     bowler_match_team_map = bowlers_match_team_map[i]
-            #     new_match_ids = []
-            #     for match_id in common_match_ids:
-            #         if match_id in bowler_match_team_map:
-            #             if bowler_match_team_map[match_id] != batsman_match_team_map[match_id]:
-            #                 new_match_ids.append(match_id)
-            #         else:
-            #             print("error")
-            #     new_All_match_ids.append(new_match_ids)
-
             new_All_match_ids = []
             for match_id in common_match_ids:
                 if match_id in player1_match_team_map and match_id in player2_match_team_map:
@@ -126,7 +93,7 @@ def Player_vs_Player_Call():
                     print("error")
 
             common_match_ids = new_All_match_ids
-            print(common_match_ids)
+            print(player1_name + " vs " + player2_name + " : " + str(common_match_ids))
 
             if(len(common_match_ids)!=0):
                 if(match_type in supersetCategory):
@@ -146,15 +113,38 @@ def Player_vs_Player_Call():
 
                 data = newdata
                 #DECIMAL TO FLOAT
-                report.loc[index] = [player1_id,player1_name,player2_id,player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), float(str(data[3]))/len(common_match_ids), 0 if int(str(data[0]))==0 else float(str(data[4]))/int(str(data[0])), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
+                return [player1_id,player1_name,player2_id,player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), float(str(data[3]))/len(common_match_ids), 0 if int(str(data[0]))==0 else float(str(data[4]))/int(str(data[0])), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
             else:
-                report.loc[index] = [player1_id,player1_name,player2_id,player2_name,0,0,0,0,0,0,0,0,0,0]
+                return [player1_id,player1_name,player2_id,player2_name,0,0,0,0,0,0,0,0,0,0]
         else:
             if(player1_name == None):
                 player1_name="Player1 Not Found"
             if(player2_name == None):
                 player2_name="Player2 Not Found"
-            report.loc[index] = [player1_id,player1_name,player2_id,player2_name,'','','','','','','','','','']
+            return [player1_id,player1_name,player2_id,player2_name,'','','','','','','','','','']
+    #Iterate every row in the dataframe except first one
+    for index, row in df.iterrows():
+        #PLAYER1 DETAILS
+        player1_url = row.iloc[0]
+        player1_id = int(player1_url.split('-')[-1])
+        
+        #PLAYER2 DETAILS
+        player2_url = row.iloc[1]
+        player2_id = int(player2_url.split('-')[-1])
+        
+        #MATCH TYPE
+        match_type = int(row.iloc[2])
+
+        #INNINGS
+        innings = int(row.iloc[3])
+
+        #GROUND
+        ground = int(row.iloc[4])
+
+        #GET DATA
+        data = get_player_vs_player_data(player1_id, player2_id, match_type, innings, ground)
+        report.loc[index] = data
+
 
     pd.set_option('display.max_colwidth', 500)
 
