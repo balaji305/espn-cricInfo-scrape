@@ -2,7 +2,8 @@ import Fantasy_Point_Table
 import Player_Table
 import Match_Table
 import Report_Generation
-import Bat_vs_Bowl
+import Player_vs_Player
+import Team_vs_Team
 import os
 
 choice = -1
@@ -18,8 +19,9 @@ while(True):
     print("4. Upload into Every Table")
     print("5. Upload and Generate Report")
     print("6. Generate Report only")
-    print("7. Bat vs Bowl Report")
-    print("8. Exit")
+    print("7. Player vs Player Report")
+    print("8. Team vs Team Report")
+    print("9. Exit")
     print("-------------------------------------------------------")
     choice = int(input("Enter your choice: "))
     print("-------------------------------------------------------")
@@ -72,11 +74,16 @@ while(True):
         print("Report Generated Successfully!!\n")
         print("Please check the Output File to know the results.")
     elif(choice == 7):
-        print("Generating Bat vs Bowl Report...\n")
-        Bat_vs_Bowl.Bat_vs_Bowl_Call()
+        print("Generating Player vs Player Report...\n")
+        Player_vs_Player.Player_vs_Player_Call()
         print("Report Generated Successfully!!\n")
         print("Please check the Output File to know the results.")
     elif(choice == 8):
+        print("Generating Team vs Team Report...\n")
+        Team_vs_Team.Team_vs_Team_Call()
+        print("Report Generated Successfully!!\n")
+        print("Please check the Output File to know the results.")
+    elif(choice == 9):
         print("Thank You for using Fantasy Cricket League Application Manager")
         nxt = input("")
         break
