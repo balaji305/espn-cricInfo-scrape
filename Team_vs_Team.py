@@ -15,9 +15,16 @@ def Team_vs_Team_Call():
     # Read the CSV file
     df = pd.read_excel("./Docs/Team_vs_Team.xlsx", header=None)
 
-    report = pd.DataFrame(
+    report_1 = pd.DataFrame(
         columns = ['Player1 ID','Player1 Name','Player2 ID','Player2 Name','Matches','Bat_Innings','Bowl_Innings','Avg Batting_Fantasy', 'Avg Bowling_Fantasy', 'Avg Value_Fantasy' ,'Avg Player_Rank','Avg In_Dream_Team','Avg Captain','Avg Vice_Captain']
     )
+
+    report_2 = pd.DataFrame(
+        columns = ['Player1 ID','Player1 Name','Player2 ID','Player2 Name','Matches','Bat_Innings','Bowl_Innings','Avg Batting_Fantasy', 'Avg Bowling_Fantasy', 'Avg Value_Fantasy' ,'Avg Player_Rank','Avg In_Dream_Team','Avg Captain','Avg Vice_Captain']
+    )
+
+    report_3 = pd.DataFrame(columns = ['Match_ID', 'Count'])
+
 
     #SUPERSET CATEGORY
     supersetCategory = [5,6,12,17]
@@ -112,22 +119,26 @@ def Team_vs_Team_Call():
 
                 data = newdata
                 #DECIMAL TO FLOAT
-                return [int(player1_id),player1_name,int(player2_id),player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), 0 if int(str(data[1]))==0 else int(str(data[3]))/int(str(data[1])), float(str(data[4]))/len(common_match_ids), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
+                return common_match_ids, [int(player1_id),player1_name,int(player2_id),player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), 0 if int(str(data[1]))==0 else int(str(data[3]))/int(str(data[1])), float(str(data[4]))/len(common_match_ids), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
             else:
-                return [int(player1_id),player1_name,int(player2_id),player2_name,0,0,0,0,0,0,0,0,0,0]
+                return common_match_ids, [int(player1_id),player1_name,int(player2_id),player2_name,0,0,0,0,0,0,0,0,0,0]
         else:
             if(player1_name == None):
                 player1_name="Player1 Not Found"
             if(player2_name == None):
                 player2_name="Player2 Not Found"
-            return [player1_id,player1_name,player2_id,player2_name,'','','','','','','','','','']
+            return [], [player1_id,player1_name,player2_id,player2_name,'','','','','','','','','','']
         
 
     team1_player_ids = []
     team2_player_ids = []
     match_type = int(input("Enter the Match Type: "))
     innings = int(input("Enter the Innings: "))
+    innings2 = 1 if innings == 2 else 2 if innings == 1 else 0
     ground = int(input("Enter the Ground: "))
+
+    count_match_ids = {}
+    player_common_match_ids = {}
 
     #Iterate every row in the dataframe except first one
     for index, row in df.iterrows():
@@ -136,22 +147,47 @@ def Team_vs_Team_Call():
         if(not pd.isnull(row[0])):
             team1_player_ids.append(row[0].split('-')[-1])
         if(not pd.isnull(row[1])):
-            print(row[1])
             team2_player_ids.append(row[1].split('-')[-1])
 
+    index = 0
     for i in range(len(team1_player_ids)):
         for j in range(len(team2_player_ids)):
             player1_id = team1_player_ids[i]
             player2_id = team2_player_ids[j]
 
-            data = get_player_vs_player_data(player1_id, player2_id, match_type, innings, ground)
-            report.loc[i*len(team2_player_ids) + j] = data
+            common_match_id, data = get_player_vs_player_data(player1_id, player2_id, match_type, innings, ground)
+            report_1.loc[index] = data
+            for match_id in common_match_id:
+                if player1_id not in player_common_match_ids:
+                    player_common_match_ids[player1_id] = []
+                if match_id not in player_common_match_ids[player1_id]:
+                    player_common_match_ids[player1_id].append(match_id)
+                    count_match_ids[match_id] = count_match_ids.get(match_id, 0) + 1
+                
+            common_match_id, data = get_player_vs_player_data(player2_id, player1_id, match_type, innings2, ground)
+            report_2.loc[index] = data
+            index += 1
+            for match_id in common_match_id:
+                if player2_id not in player_common_match_ids:
+                    player_common_match_ids[player2_id] = []
+                if match_id not in player_common_match_ids[player2_id]:
+                    player_common_match_ids[player2_id].append(match_id)
+                    count_match_ids[match_id] = count_match_ids.get(match_id, 0) + 1
+
+    count_match_ids = dict(sorted(count_match_ids.items(), key=lambda item: item[1], reverse=True))
+    
+    index = 0
+    for match_id in count_match_ids:
+        report_3.loc[index] = [match_id, count_match_ids[match_id]]
+        index += 1
 
     pd.set_option('display.max_colwidth', 500)
 
     #WRITING IN OUTPUT FILE
     excel_writer = pd.ExcelWriter('./Docs/Team_vs_Team_Output.xlsx', engine='xlsxwriter')
-    report.to_excel(excel_writer, index=False, sheet_name='Team_VS_Team')
+    report_1.to_excel(excel_writer, index=False, sheet_name='Team1')
+    report_2.to_excel(excel_writer, index=False, sheet_name='Team2')
+    report_3.to_excel(excel_writer, index=False, sheet_name='MATCH_IDS')
     excel_writer.close()
 
     # Don't forget to close your cursor and connection when done
