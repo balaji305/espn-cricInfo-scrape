@@ -112,7 +112,7 @@ def Team_vs_Team_Call():
 
                 data = newdata
                 #DECIMAL TO FLOAT
-                return [int(player1_id),player1_name,int(player2_id),player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), float(str(data[3]))/len(common_match_ids), 0 if int(str(data[0]))==0 else float(str(data[4]))/int(str(data[0])), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
+                return [int(player1_id),player1_name,int(player2_id),player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), 0 if int(str(data[1]))==0 else int(str(data[3]))/int(str(data[1])), float(str(data[4]))/len(common_match_ids), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
             else:
                 return [int(player1_id),player1_name,int(player2_id),player2_name,0,0,0,0,0,0,0,0,0,0]
         else:
@@ -133,9 +133,11 @@ def Team_vs_Team_Call():
     for index, row in df.iterrows():
         if(index == 0):
             continue
-
-        team1_player_ids.append(row[0].split('-')[-1])
-        team2_player_ids.append(row[1].split('-')[-1])
+        if(not pd.isnull(row[0])):
+            team1_player_ids.append(row[0].split('-')[-1])
+        if(not pd.isnull(row[1])):
+            print(row[1])
+            team2_player_ids.append(row[1].split('-')[-1])
 
     for i in range(len(team1_player_ids)):
         for j in range(len(team2_player_ids)):

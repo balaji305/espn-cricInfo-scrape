@@ -113,7 +113,7 @@ def Player_vs_Player_Call():
 
                 data = newdata
                 #DECIMAL TO FLOAT
-                return [player1_id,player1_name,player2_id,player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), float(str(data[3]))/len(common_match_ids), 0 if int(str(data[0]))==0 else float(str(data[4]))/int(str(data[0])), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
+                return [int(player1_id),player1_name,int(player2_id),player2_name,len(common_match_ids),int(str(data[0])),int(str(data[1])), 0 if int(str(data[0]))==0 else float(str(data[2]))/int(str(data[0])), 0 if int(str(data[1]))==0 else int(str(data[3]))/int(str(data[1])), float(str(data[4]))/len(common_match_ids), float(str(data[5])), float(str(data[6])), float(str(data[7])), float(str(data[8]))]
             else:
                 return [player1_id,player1_name,player2_id,player2_name,0,0,0,0,0,0,0,0,0,0]
         else:
@@ -124,6 +124,8 @@ def Player_vs_Player_Call():
             return [player1_id,player1_name,player2_id,player2_name,'','','','','','','','','','']
     #Iterate every row in the dataframe except first one
     for index, row in df.iterrows():
+        if index == 0:
+            continue
         #PLAYER1 DETAILS
         player1_url = row.iloc[0]
         player1_id = int(player1_url.split('-')[-1])
