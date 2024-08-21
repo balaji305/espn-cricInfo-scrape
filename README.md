@@ -33,4 +33,36 @@ Here is a working example of how to use the scraper: **[Demo coming soon]**
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/cricinfo-scraper.git
+   git clone https://github.com/balaji305/espn-cricinfo-scrape.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd espn-cricinfo-scrape
+   ```
+3. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Usage
+1. **Run the scraper:**
+   ```bash
+   python <file-name>.py
+   ```
+2. **Specify the data you want to scrape:**
+   - Players
+   - Matches
+   - Grounds
+   - Tournaments
+   - Series
+
+## Contributing
+Contributions are welcome! If you'd like to improve this scraper or add new features, feel free to fork the repository and submit a pull request.
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+- ESPN Cricinfo for providing comprehensive cricket data.
+- [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) and [Requests](https://docs.python-requests.org/en/latest/) for making web scraping easier.
+```
